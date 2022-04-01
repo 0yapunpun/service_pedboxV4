@@ -1,0 +1,25 @@
+{
+  "name": "services_pedboxV4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.3",
+    "http-errors": "^1.7.0",
+    "moment": "^2.29.1",
+    "mssql": "^8.0.2",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.15",
+    "underscore": "^1.13.2",
+    "util": "^0.12.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
