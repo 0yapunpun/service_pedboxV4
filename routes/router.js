@@ -20,6 +20,7 @@ router.post('/documentos/deleteRegister', documentosController.deleteDocumentReg
 router.get('/notifications/:id_user', notificationsController.getNotifications)
 router.post('/notifications/createNotification', notificationsController.createNotification)
 router.get('/removeNotificationByKind/:id_user/:kind', notificationsController.removeNotificationByKind)
+router.get('/getNotificationsCalendar/:id_user', notificationsController.getNotificationsCalendar)
 
 
 module.exports = router;

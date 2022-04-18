@@ -37,6 +37,18 @@ service.removeNotificationByKind = async(id_user, kind) => {
   return {'success': true, 'result': r };
 }
 
+service.getNotificationsCalendar = async(id_user, currentDate) => { 
+  let query = `
+    SELECT id, subject, id_user_register, date_begin, hour_begin, notification FROM tbl_wt_activitie 
+    WHERE id_user_register = ${id_user} AND date_begin = "${currentDate}" AND type_task = 4 AND notification != "";
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
 
 
 module.exports = service

@@ -17,5 +17,11 @@ controller.removeNotificationByKind = async(req, res, next) => {
   res.send(response)
 }
 
+controller.getNotificationsCalendar = async(req, res, next) => { 
+  let currentDate = new Date().toISOString().slice(0, 10);
+  let response = await service.getNotificationsCalendar(req.params.id_user, currentDate); 
+  res.send(response.result)
+}
+
 
 module.exports = controller

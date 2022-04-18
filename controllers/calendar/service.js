@@ -3,7 +3,8 @@ const mysql = require("../../lib/mysql");
 
 mysql.crearconexion();
 
-service.birthdays = async(id_company) => {
+// mostrar cumpleaños en calendario
+service.birthdays = async(id_company) => { 
   let query = `
     SELECT u.id, p.num_identification, p.date_birth, p.first_name, p.first_name, p.second_name, p.first_lastname, p.photo 
     FROM tbl_gen_person p 
