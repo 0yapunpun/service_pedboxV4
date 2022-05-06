@@ -16,7 +16,7 @@ controller.currentBirthdays = async(req, res, next) => {
     
     for (let i = 0; i < birthdays.length; i++) {
       let day = new Date(birthdays[i].date_birth);
-      if ((day.getDate() + 1 == currentDate.getDate()) && (day.getMonth() && currentDate.getMonth())) {
+      if ((day.getDate() + 1 == currentDate.getDate()) && (day.getMonth() == currentDate.getMonth())) {
         currentBirthdays.push(birthdays[i])
       }
     }
