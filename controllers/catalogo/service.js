@@ -38,4 +38,57 @@ service.getCatalogDetailGyW = async(id_company, productCode) => { // colores y t
   return {'success': true, 'result': r };
 }
 
+service.getCodesCatalog = async(id_company) => { 
+  let query = `
+    SELECT code
+    FROM tbl_gen_item
+    where id_company = ${id_company} 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.getImagesCatalog = async(id_company) => { 
+  let query = `
+    SELECT group_concat(id) id, group_concat(code) code , image
+    FROM tbl_gen_item
+    where id_company = ${id_company} and image <> ''
+    GROUP BY image
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.getProductsByCode = async(code) => { 
+  let query = `
+    SELECT code, id
+    FROM tbl_gen_item
+    WHERE code = "${code}" 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.addImgProduct = async(code, imgUrl) => { 
+  let query = `
+    UPDATE tbl_gen_item 
+    SET image = "${imgUrl}"
+    WHERE code = "${code}" 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
 module.exports = service

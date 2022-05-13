@@ -2,7 +2,7 @@ const controller = {};
 const service = require('./service.js');
 const config = require('../../config.js');
 const fs = require('fs');
-var path = require('path')
+var path = require('path');
 const multer  = require('multer');
 const now = Date.now();
 

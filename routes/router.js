@@ -27,6 +27,10 @@ router.get('/getNotificationsCalendar/:id_user', notificationsController.getNoti
 router.get('/catalog/colors/:id_company', catalogController.catalogColors)
 router.get('/catalog/GyW', catalogController.catalogGyW)
 router.get('/catalog/detail/:id_company/:code_product', catalogController.catalogDetailGyW)
+router.get('/catalog/images/:id_company', catalogController.catalogImages)
+router.get('/catalog/codes/:id_company', catalogController.catalogCodes)
+
+router.post('/catalog/uploadImages/:fileName', catalogController.uploadImages)
 
 
 module.exports = router;
