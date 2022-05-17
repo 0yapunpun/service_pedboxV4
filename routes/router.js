@@ -28,9 +28,21 @@ router.get('/catalog/colors/:id_company', catalogController.catalogColors)
 router.get('/catalog/GyW', catalogController.catalogGyW)
 router.get('/catalog/detail/:id_company/:code_product', catalogController.catalogDetailGyW)
 router.get('/catalog/images/:id_company', catalogController.catalogImages)
+router.get('/catalog/attachments/:id_company', catalogController.catalogAttachments)
 router.get('/catalog/codes/:id_company', catalogController.catalogCodes)
-
 router.post('/catalog/uploadImages/:fileName', catalogController.uploadImages)
+
+router.post('/catalog/uploadAttachedsFichas/:fileName/:id_company', catalogController.uploadAttachedsFichas)
+router.post('/catalog/uploadAttachedsImages/:fileName/:id_company/:sequence', catalogController.uploadAttachedsImages)
+router.post('/catalog/relateImageArray', catalogController.relateItemToImagesArray)
+
+router.post('/catalog/uploadImgCode', catalogController.uploadImagesCode)
+router.get('/catalog/removeImages/:code/:id_company', catalogController.removeImgbyCode)
+
+// Endpoint de prueba
+router.get('/catalog/getItems/substring/:code/:id_company', catalogController.selectItemsByCodeSubstring)
+
+
 
 
 module.exports = router;
