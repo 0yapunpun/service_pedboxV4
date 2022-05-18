@@ -6,9 +6,11 @@ var path = require('path');
 const multer  = require('multer');
 const now = Date.now();
 
+let id_current_company = 1; 
+
 let storeImages = multer.diskStorage({
   destination: function (req, file, callback) {
-    callback(null, config.urlBase+'/public/imagenes_catalogo');
+    callback(null, config.urlBase+'/public/imagenes_catalogo/'+ id_current_company);
   },
   filename: function (req, file, callback) {
     var name = file.originalname
@@ -27,19 +29,20 @@ let addImgUrlByCode = async(code, imgUrl) => {
 }
 
 controller.uploadImages = async(req, res, next) => {
+  id_current_company = req.params.id_company;
   let fileName = req.params.fileName;
 
   let codeMatches = await codeExists(fileName); 
 
   if (codeMatches.result.length) {
-    uploadImages(req, res, (err) => {
+    uploadImages(req, res, async (err) => {
       if (err) {
         return res.send({success: false, codeMatches: true});
       } else {
         let code = fileName;
-        let imgUrl = 'http://api.pedbox.co:7777/imagenes_catalogo/' + req.file.filename; // TODO cada empresa debe tener su propia carpeta 
+        let imgUrl = 'http://api.pedbox.co:7777/imagenes_catalogo/' + id_current_company + '/' + req.file.filename; 
         
-        service.addImgProduct(code, imgUrl) // TODO usar async await para evitar problemas acá
+        await service.addImgProduct(code, imgUrl) 
 
         return res.send({success: true, codeMatches: true});
       };
@@ -71,13 +74,12 @@ controller.uploadAttachedsFichas = async(req, res, next) => {
           type: req.file.mimetype, 
           url: 'http://api.pedbox.co:7777/imagenes_catalogo/' + req.file.filename,
           name_file: req.file.filename,
-          description: "a",
+          description: "",
           in_quotation: 0,
           sequence: 0
         }
         await service.addAttachments(data); 
       }
-
       return res.send({success: false, message: "Productos Relacionados"});      
     };
   })
@@ -99,12 +101,11 @@ controller.uploadAttachedsImages = async(req, res, next) => {
         type: req.file.mimetype, 
         url: 'http://api.pedbox.co:7777/imagenes_catalogo/' + req.file.filename,
         name_file: req.file.filename,
-        description: "a",
+        description: "",
         in_quotation: 0,
         sequence: sequence
       }
       let response = await service.addAttachments(data); 
-
       return res.send({success: true, message: "Imágen subida con éxito", id_image: response.result[1][0]["LAST_INSERT_ID()"]});      
     };
   })
@@ -143,19 +144,19 @@ controller.removeImgbyCode = async(req, res, next) => {
 }
 
 controller.catalogColors = async(req, res, next) => {
-  let id_company = 20; // TODO quitar id_company quemado
+  let id_company = req.params.id_company;
   let birthdays = await service.getCatalogColors(id_company); 
   res.send(birthdays)
 }
 
-controller.catalogGyW = async(req, res, next) => { // Catalogo Grulla & Wellco
-  let id_company = 20; // TODO quitar id_company quemado
+controller.catalogGyW = async(req, res, next) => { 
+  let id_company = 20; // Grulla y Wellco 
   let catalog = await service.getCatalogGyW(id_company); 
   res.send(catalog)
 }
 
 controller.catalogDetailGyW = async(req, res, next) => { 
-  let id_company = 20; //TODO quitar id_company quemado
+  let id_company = req.params.id_company;
   let productCode = req.params.code_product;
 
   let catalog = await service.getCatalogDetailGyW(id_company, productCode); 
@@ -163,7 +164,7 @@ controller.catalogDetailGyW = async(req, res, next) => {
 }
 
 controller.catalogCodes = async(req, res, next) => { 
-  let id_company = 20; //TODO quitar id_company quemado
+  let id_company = req.params.id_company;
   let codesArray = [];
 
   let codes = await service.getCodesCatalog(id_company); 
@@ -176,14 +177,14 @@ controller.catalogCodes = async(req, res, next) => {
 }
 
 controller.catalogImages = async(req, res, next) => { 
-  let id_company = 20; //TODO quitar id_company quemado
+  let id_company = req.params.id_company;
 
   let images = await service.getImagesCatalog(id_company); 
   res.send(images)
 }
 
 controller.catalogAttachments = async(req, res, next) => { 
-  let id_company = 20; //TODO quitar id_company quemado
+  let id_company = req.params.id_company;
 
   let images = await service.getAttachmentsCatalog(id_company); 
   res.send(images)

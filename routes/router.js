@@ -30,7 +30,7 @@ router.get('/catalog/detail/:id_company/:code_product', catalogController.catalo
 router.get('/catalog/images/:id_company', catalogController.catalogImages)
 router.get('/catalog/attachments/:id_company', catalogController.catalogAttachments)
 router.get('/catalog/codes/:id_company', catalogController.catalogCodes)
-router.post('/catalog/uploadImages/:fileName', catalogController.uploadImages)
+router.post('/catalog/uploadImages/:fileName/:id_company', catalogController.uploadImages)
 
 router.post('/catalog/uploadAttachedsFichas/:fileName/:id_company', catalogController.uploadAttachedsFichas)
 router.post('/catalog/uploadAttachedsImages/:fileName/:id_company/:sequence', catalogController.uploadAttachedsImages)
