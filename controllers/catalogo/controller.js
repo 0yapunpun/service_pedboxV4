@@ -53,6 +53,7 @@ controller.uploadImages = async(req, res, next) => {
 }
 
 controller.uploadAttachedsFichas = async(req, res, next) => {
+  id_current_company = req.params.id_company;
   let fileName = req.params.fileName;
   let id_company = req.params.id_company;
 
@@ -72,7 +73,7 @@ controller.uploadAttachedsFichas = async(req, res, next) => {
           id_company: Number(id_company),
           id_item: relatedProducts.result[i].id,
           type: req.file.mimetype, 
-          url: 'http://api.pedbox.co:7777/imagenes_catalogo/' + req.file.filename,
+          url: 'http://api.pedbox.co:7777/imagenes_catalogo/' + id_current_company + '/' + req.file.filename ,
           name_file: req.file.filename,
           description: "",
           in_quotation: 0,
@@ -86,6 +87,7 @@ controller.uploadAttachedsFichas = async(req, res, next) => {
 }
 
 controller.uploadAttachedsImages = async(req, res, next) => {
+  id_current_company = req.params.id_company;
   let sub_code = req.params.fileName;
   let id_company = req.params.id_company;
   let sequence = Number(req.params.sequence);
@@ -99,7 +101,7 @@ controller.uploadAttachedsImages = async(req, res, next) => {
         id_company: Number(id_company),
         id_item: sub_code,
         type: req.file.mimetype, 
-        url: 'http://api.pedbox.co:7777/imagenes_catalogo/' + req.file.filename,
+        url: 'http://api.pedbox.co:7777/imagenes_catalogo/' + id_current_company + '/' + req.file.filename,
         name_file: req.file.filename,
         description: "",
         in_quotation: 0,
