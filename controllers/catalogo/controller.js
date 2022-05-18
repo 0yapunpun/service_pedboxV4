@@ -59,6 +59,8 @@ controller.uploadAttachedsFichas = async(req, res, next) => {
 
   let relatedProducts = await service.getProductsByCodeSubstring(fileName, id_company); 
 
+  console.log(relatedProducts)
+
   if (relatedProducts.result.length == 0) {
     return res.send({success: false, message: "El codigo no existe en ningún producto"});
   }
@@ -115,9 +117,19 @@ controller.uploadAttachedsImages = async(req, res, next) => {
 
 controller.relateItemToImagesArray = async(req, res, next) => {
   let id_product = req.body.id_product;
-  let image_array = JSON.stringify(req.body.image_array); // Array as string
+  let image_array = req.body.image_array; 
 
-  let response = await service.relateImagesArrayToItem(id_product, image_array); 
+  itemHasImage = await service.getImageByIdItem(id_product); 
+
+  if (itemHasImage.result[0].image == "") { // Append first image array in case it has no image
+    attachmentLink = await service.getAttachmentsById(image_array[0]); 
+
+    console.log(attachmentLink)
+
+    await service.addImgProduct(id_product, attachmentLink.result[0].url); 
+  }
+
+  let response = await service.relateImagesArrayToItem(id_product, JSON.stringify(image_array)); 
   res.send(response)  
 }
 

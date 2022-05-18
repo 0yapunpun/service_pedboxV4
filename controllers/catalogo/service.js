@@ -144,6 +144,33 @@ service.addAttachments = async(data) => {
   return {'success': true, 'result': r };
 }
 
+service.getImageByIdItem = async(id_item) => { 
+  let query = `
+    SELECT *
+    FROM tbl_gen_item 
+    WHERE code = ${id_item}
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+// 774
+service.getAttachmentsById = async(id_item) => { 
+  let query = `
+    SELECT *
+    FROM tbl_gen_item_attachments 
+    WHERE id = ${id_item}
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
 service.relateImagesArrayToItem = async(id_item, image_array) => { 
   let query = `
     UPDATE tbl_gen_item 
