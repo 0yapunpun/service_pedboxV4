@@ -4,9 +4,10 @@ const config = require('../../config.js');
 const fs = require('fs');
 var path = require('path');
 const multer  = require('multer');
+const { JSON } = require('mysql/lib/protocol/constants/types');
 const now = Date.now();
 
-let id_current_company = 1; 
+let id_current_company = 1; // Variable for save files in the correspond folder
 
 let storeImages = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -59,8 +60,6 @@ controller.uploadAttachedsFichas = async(req, res, next) => {
 
   let relatedProducts = await service.getProductsByCodeSubstring(fileName, id_company); 
 
-  console.log(relatedProducts)
-
   if (relatedProducts.result.length == 0) {
     return res.send({success: false, message: "El codigo no existe en ningún producto"});
   }
@@ -98,7 +97,6 @@ controller.uploadAttachedsImages = async(req, res, next) => {
     if (err) {
       return res.send({success: false, message: "No fue posible subir la imágen"});
     } else {
-
       let data = {
         id_company: Number(id_company),
         id_item: sub_code,
@@ -119,17 +117,13 @@ controller.relateItemToImagesArray = async(req, res, next) => {
   let id_product = req.body.id_product;
   let image_array = req.body.image_array; 
 
-  itemHasImage = await service.getImageByIdItem(id_product); 
+  // Append first array image to item
+  let attachmentLink = await service.getAttachmentsById(image_array[0]); 
+  await service.addImgProduct(id_product, attachmentLink.result[0].url); 
 
-  if (itemHasImage.result[0].image == "") { // Append first image array in case it has no image
-    attachmentLink = await service.getAttachmentsById(image_array[0]); 
+  console.log(id_product, image_array)
 
-    console.log(attachmentLink)
-
-    await service.addImgProduct(id_product, attachmentLink.result[0].url); 
-  }
-
-  let response = await service.relateImagesArrayToItem(id_product, JSON.stringify(image_array)); 
+  let response = await service.relateImagesArrayToItem(id_product, image_array); 
   res.send(response)  
 }
 
@@ -169,12 +163,39 @@ controller.catalogGyW = async(req, res, next) => {
   res.send(catalog)
 }
 
+controller.catalogGyWPrueba = async(req, res, next) => { 
+  let id_company = 20; // Grulla y Wellco 
+  let catalog = await service.catalogGyWPrueba(id_company); 
+  res.send(catalog)
+}
+
+
 controller.catalogDetailGyW = async(req, res, next) => { 
   let id_company = req.params.id_company;
   let productCode = req.params.code_product;
 
   let catalog = await service.getCatalogDetailGyW(id_company, productCode); 
   res.send(catalog)
+}
+
+controller.imageAttachment = async(req, res, next) => { 
+  let imagesArray = req.params.images_array.split(",");
+  let imagesResult = []; 
+
+  try {
+    for (let i = 0; i < imagesArray.length; i++) {
+      let id_attachment = imagesArray[i]
+      let image = await service.getAttachmentsById(id_attachment);
+  
+      if (image.result[0].url) {
+        imagesResult.push(image.result[0].url)
+      }
+    }    
+  } catch (error) {
+    return res.send([])
+  }
+
+  res.send(imagesResult)
 }
 
 controller.catalogCodes = async(req, res, next) => { 
@@ -190,6 +211,35 @@ controller.catalogCodes = async(req, res, next) => {
   res.send(codesArray)
 }
 
+controller.catalogCodesSubstring = async(req, res, next) => { 
+  let id_company = req.params.id_company;
+  let codesArray = [];
+
+  let codes = await service.getCodesSubstringCatalog(id_company); 
+
+  for (let i = 0; i < codes.result.length; i++) {
+    codesArray.push(codes.result[i].codep)
+  }
+
+  res.send(codesArray)
+}
+
+controller.catalogCodesSubstringDesc = async(req, res, next) => { 
+  let id_company = req.params.id_company;
+  let codesArray = [];
+
+  let codes = await service.getCodesSubstringCatalog(id_company); 
+
+  for (let i = 0; i < codes.result.length; i++) {
+    let string =  codes.result[i].codep + ` (${codes.result[i].description})`
+    codesArray.push(string)
+  }
+
+  res.send(codesArray)
+}
+
+
+
 controller.catalogImages = async(req, res, next) => { 
   let id_company = req.params.id_company;
 
@@ -203,6 +253,129 @@ controller.catalogAttachments = async(req, res, next) => {
   let images = await service.getAttachmentsCatalog(id_company); 
   res.send(images)
 }
+
+controller.productBycodeColor = async(req, res, next) => { 
+  let code = req.params.code;
+  let code_color = req.params.code_color;
+
+  let response = await service.getProductBycodeColor(code, code_color); 
+  res.send(response)
+}
+
+controller.catalogAttributesAndDetail = async(req, res, next) => { 
+  let id_company = req.params.id_company;
+
+  let attributes = await service.getAttributesCatalog(id_company); 
+  let attributesDetail = await service.getAttributesDestailCatalog(id_company); 
+
+  res.send({attributes: attributes.result, attributesDetail: attributesDetail.result})
+}
+
+controller.catalogAttributesByIdItem = async(req, res, next) => { 
+  let id_item = req.params.id_item;
+
+  let attributes = await service.catalogAttributeByIdItem(id_item); 
+
+  if (attributes.result.length) {
+    let attrArray = [];
+
+    for (let i = 0; i < attributes.result.length; i++) {
+      if (!attributes.result[i]) {return res.send({success: false}) }
+
+      let attrDetail = await service.catalogAttributeDetailDesc(attributes.result[i].id_detail_attribute); 
+
+      if (!attrDetail.result[0]) {return res.send({success: false}) }
+
+      let attrDetailParent = await service.catalogAttributeDesc(attrDetail.result[0].id_attribute); 
+  
+      if (!attrDetailParent.result[0] || !attrDetail.result[0]) {return res.send({success: false}) }
+
+      let attrsObj = {};
+          attrsObj[attrDetailParent.result[0].description] = attrDetail.result[0].description;
+
+      attrArray.push(attrsObj)
+    }
+
+
+    return res.send({success: true, data: attrArray})
+  }
+
+  res.send({success: false})
+}
+
+controller.catalogCodesAssociateToAttribute = async(req, res, next) => { 
+  let id_attribute = req.params.id_attribute;
+  let codesArray = [];
+
+  let response = await service.catalogAttributesByAttributeId(id_attribute); 
+
+  for (let i = 0; i < response.result.length; i++) {
+    let id_item = response.result[i].id_item;
+    let item = await service.getProductsById(id_item); 
+
+    if (!codesArray.includes(item.result[0].code.substring(0, 5))) {
+      codesArray.push(item.result[0].code.substring(0, 5))
+    }
+  }
+
+  res.send(codesArray)
+}
+
+controller.catalogRelateAttributesBySubstring = async(req, res, next) => { 
+  let code = req.body.code_substring;
+  let body = {
+    id_company : req.body.id_company,
+    id_attribute : req.body.id_detail_attribute,
+    idUser : req.body.id_user,
+    status : req.body.status
+  };
+
+  let items = await service.getProductsByCodeSubstring(code, body.id_company); 
+
+  try {
+    for (let i = 0; i < items.result.length; i++) {
+      let id_item = items.result[i].id;
+      await service.addAttributeItem(body, id_item); 
+    }
+    res.send({success: true})
+  } catch (error) {
+    res.send({success: false})
+  }
+}
+
+controller.deleteAttributeById = async(req, res, next) => { 
+  let id_attribute = req.params.id_attribute;
+  let id_item = req.params.id_item;
+
+  let response = await service.deleteAttributeById(id_item, id_attribute); 
+  
+  res.send(response)
+}
+
+controller.catalogDeleteAttributesByCode = async(req, res, next) => { 
+  let id_attribute = req.params.id_attribute;
+  let code = req.params.code;
+  let id_company = req.params.id_company;
+
+  let items = await service.getProductsByCodeSubstring(code, id_company); 
+
+  for (let i = 0; i < items.result.length; i++) {
+    let response = await service.deleteAttributeById(items.result[i].id, id_attribute); 
+  }
+
+  res.send({succes: true})
+}
+
+controller.deleteAttachmentDetailAttribute = async(req, res, next) => { 
+  let id_image = req.params.id_image;
+  let id_attribute = req.params.id_attribute;
+
+  let response = await service.deleteAttachmentDetailAttribute(id_image, id_attribute); 
+
+  res.send(response)
+}
+
+
 
 
 module.exports = controller

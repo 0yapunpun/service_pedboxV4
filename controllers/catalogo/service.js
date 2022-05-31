@@ -16,8 +16,75 @@ service.getCatalogColors = async(id_company) => {
 
 service.getCatalogGyW = async(id_company) => {
   let query = `
-    SELECT SUBSTRING(code,1,5) codep, description 
+    SELECT SUBSTRING(code,1,5) codep, SUBSTRING(code,6,9) codeC, description, image, image_array 
     FROM tbl_gen_item WHERE id_company = ${id_company} group by SUBSTRING(code,1,5) 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.catalogGyWPrueba = async(id_company) => {
+  let query = `
+    SELECT code, description, image, image_array, id
+    FROM tbl_gen_item WHERE id_company = ${id_company} 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.catalogAttributeByIdItem = async(id_item) => {
+  let query = `
+    SELECT id_item, id_detail_attribute
+    FROM tbl_gen_item_attribute WHERE id_item = ${id_item} 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+// ***
+service.catalogAttributeDetailDesc = async(id_attribute) => { 
+  let query = `
+    SELECT id, id_attribute, description
+    FROM tbl_gen_attribute_detail
+    WHERE id = ${id_attribute}
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.catalogAttributeDesc = async(id) => { 
+  let query = `
+    SELECT id, description
+    FROM tbl_gen_attribute
+    WHERE id = ${id}
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+// ***
+
+service.catalogAttributeAndDetailDescription = async(id_attribute) => { 
+  let query = `
+    SELECT a.description, a.id, d.description, d.id
+    FROM tbl_gen_attribute_detail d
+    LEFT JOIN tbl_gen_attribute a
+    ON  a.id = d.id_attribute 
+    WHERE d.id = ${id_attribute}
   `;
 
   const { e, r } = await mysql.aQuery(query);
@@ -43,6 +110,19 @@ service.getCodesCatalog = async(id_company) => {
     SELECT code
     FROM tbl_gen_item
     where id_company = ${id_company} 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.getCodesSubstringCatalog = async(id_company) => {  // TODO
+  let query = `
+    SELECT SUBSTRING(code,1,5) codep, description
+    FROM tbl_gen_item 
+    WHERE id_company = ${id_company} group by SUBSTRING(code,1,5) 
   `;
 
   const { e, r } = await mysql.aQuery(query);
@@ -84,6 +164,19 @@ service.getProductsByCode = async(code) => {
     SELECT code, id
     FROM tbl_gen_item
     WHERE code = "${code}" 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.getProductsById = async(id) => { 
+  let query = `
+    SELECT code, id
+    FROM tbl_gen_item
+    WHERE id = "${id}" 
   `;
 
   const { e, r } = await mysql.aQuery(query);
@@ -157,7 +250,6 @@ service.getImageByIdItem = async(id_item) => {
   return {'success': true, 'result': r };
 }
 
-// 774
 service.getAttachmentsById = async(id_item) => { 
   let query = `
     SELECT *
@@ -183,5 +275,99 @@ service.relateImagesArrayToItem = async(id_item, image_array) => {
   if (e) { console.log("Query Failed", e); return {'success': false }};
   return {'success': true, 'result': r };
 }
+
+service.getProductBycodeColor = async (code, code_color) => { 
+  let query = `
+    SELECT *
+    FROM tbl_gen_item
+    WHERE code LIKE "${code}%${code_color}" 
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.getAttributesDestailCatalog = async (id_company) => { 
+  let query = `
+    SELECT * 
+    FROM tbl_gen_attribute_detail 
+    WHERE id_company = ${id_company};
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.getAttributesCatalog = async (id_company) => { 
+  let query = `
+    SELECT * 
+    FROM tbl_gen_attribute 
+    WHERE id_company = ${id_company};
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.addAttributeItem = async (body, id_item) => { 
+  let query = `
+    INSERT INTO tbl_gen_item_attribute (id_company, id_item, id_detail_attribute, status, id_user)
+    VALUES (${body.id_company}, ${id_item}, ${body.id_attribute}, ${body.status}, ${body.idUser});
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.catalogAttributesByAttributeId = async (id_attribute) => { 
+  let query = `
+    SELECT id_item
+    FROM tbl_gen_item_attribute
+    WHERE id_detail_attribute = ${id_attribute}
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.deleteAttributeById = async(id, id_attribute) => { 
+  let query = `
+    DELETE 
+    FROM tbl_gen_item_attribute 
+    WHERE id_item = "${id}" AND id_detail_attribute = ${id_attribute}
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.deleteAttachmentDetailAttribute = async(id_imgage, id_attribute) => { 
+  let query = `
+    DELETE 
+    FROM tbl_gen_attribute_detail_attachments 
+    WHERE id = "${id_imgage}" AND id_attribute_detail = ${id_attribute}
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+
+
+
 
 module.exports = service

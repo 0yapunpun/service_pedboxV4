@@ -25,24 +25,37 @@ router.get('/getNotificationsCalendar/:id_user', notificationsController.getNoti
 
 // Catalogo
 router.get('/catalog/colors/:id_company', catalogController.catalogColors)
+
 router.get('/catalog/GyW', catalogController.catalogGyW)
+router.get('/catalog/GyW/prueba', catalogController.catalogGyWPrueba)
+
+
 router.get('/catalog/detail/:id_company/:code_product', catalogController.catalogDetailGyW)
 router.get('/catalog/images/:id_company', catalogController.catalogImages)
 router.get('/catalog/attachments/:id_company', catalogController.catalogAttachments)
 router.get('/catalog/codes/:id_company', catalogController.catalogCodes)
-router.post('/catalog/uploadImages/:fileName/:id_company', catalogController.uploadImages)
 
+router.get('/catalog/codesSubstring/:id_company', catalogController.catalogCodesSubstring)
+router.get('/catalog/codesSubstringDesc/:id_company', catalogController.catalogCodesSubstringDesc)
+
+router.post('/catalog/uploadImages/:fileName/:id_company', catalogController.uploadImages)
 router.post('/catalog/uploadAttachedsFichas/:fileName/:id_company', catalogController.uploadAttachedsFichas)
 router.post('/catalog/uploadAttachedsImages/:fileName/:id_company/:sequence', catalogController.uploadAttachedsImages)
 router.post('/catalog/relateImageArray', catalogController.relateItemToImagesArray)
-
 router.post('/catalog/uploadImgCode', catalogController.uploadImagesCode)
 router.get('/catalog/removeImages/:code/:id_company', catalogController.removeImgbyCode)
-
-// Endpoint de prueba
 router.get('/catalog/getItems/substring/:code/:id_company', catalogController.selectItemsByCodeSubstring)
+router.get('/catalog/getImagesAttachment/:images_array', catalogController.imageAttachment)
+router.get('/catalog/getItemByCodeColor/:code/:code_color', catalogController.productBycodeColor)
+
+router.get('/catalog/getAttributes/:id_company', catalogController.catalogAttributesAndDetail)
+router.get('/catalog/deleteAttributeAssociated/:id_attribute/:id_item', catalogController.deleteAttributeById)
+router.post('/catalog/relateAttributesBySubstring', catalogController.catalogRelateAttributesBySubstring)
+router.get('/catalog/catalogCodesAssociateToAttribute/:id_attribute', catalogController.catalogCodesAssociateToAttribute)
+router.get('/catalog/catalogDeleteAttributesByCode/:id_attribute/:code/:id_company', catalogController.catalogDeleteAttributesByCode)
+router.get('/catalog/deleteAttachmentDetailAttribute/:id_image/:id_attribute', catalogController.deleteAttachmentDetailAttribute)
 
 
-
+router.get('/catalog/catalogAttributesByIdItem/:id_item', catalogController.catalogAttributesByIdItem)
 
 module.exports = router;
