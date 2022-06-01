@@ -76,6 +76,23 @@ service.catalogAttributeDesc = async(id) => {
   if (e) { console.log("Query Failed", e); return {'success': false }};
   return {'success': true, 'result': r };
 }
+
+service.getCatalogGrulla = async() => { // TODO query juan
+  let query = `
+    SELECT i.code, i.description, i.image, i.image_array, i.id, group_concat(p.description) atributos, group_concat(d.description) detalle_atributos, SUBSTRING(i.code,6,2) size, SUBSTRING(i.code,8,2) color
+    FROM tbl_gen_item i 
+    LEFT JOIN tbl_gen_item_attribute a ON a.id_item = i.id  
+    LEFT JOIN tbl_gen_attribute_detail d ON d.id = a.id_detail_attribute
+    LEFT JOIN tbl_gen_attribute p ON p.id = d.id_attribute
+    WHERE i.id_company = 20 
+    GROUP BY i.id;
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
 // ***
 
 service.catalogAttributeAndDetailDescription = async(id_attribute) => { 
@@ -229,6 +246,19 @@ service.addAttachments = async(data) => {
     INSERT INTO tbl_gen_item_attachments (id_company, id_item, type, url, name_file, in_quotation,  description, seq)
     VALUES (${data.id_company}, ${data.id_item}, "${data.type}", "${data.url}", "${data.name_file}", ${data.in_quotation}, "${data.description}", ${data.sequence});
     SELECT LAST_INSERT_ID()
+  `;
+
+  const { e, r } = await mysql.aQuery(query);
+  
+  if (e) { console.log("Query Failed", e); return {'success': false }};
+  return {'success': true, 'result': r };
+}
+
+service.deleteAttachmentsByIdItem = async(id_item, id_attribute) => { 
+  let query = `
+    DELETE 
+    FROM tbl_gen_item_attachments 
+    WHERE id_item = "${id_item}" AND id_company = ${id_attribute}
   `;
 
   const { e, r } = await mysql.aQuery(query);

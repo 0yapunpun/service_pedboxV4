@@ -113,6 +113,15 @@ controller.uploadAttachedsImages = async(req, res, next) => {
   })
 }
 
+controller.deleteAttachmentsByIdItem = async(req, res, next) => {
+  let id_item = req.params.id_item;
+  let id_company = req.params.id_company; 
+
+  let response = await service.deleteAttachmentsByIdItem(id_item, id_company); 
+
+  res.send(response)  
+}
+
 controller.relateItemToImagesArray = async(req, res, next) => {
   let id_product = req.body.id_product;
   let image_array = req.body.image_array; 
@@ -120,8 +129,6 @@ controller.relateItemToImagesArray = async(req, res, next) => {
   // Append first array image to item
   let attachmentLink = await service.getAttachmentsById(image_array[0]); 
   await service.addImgProduct(id_product, attachmentLink.result[0].url); 
-
-  console.log(id_product, image_array)
 
   let response = await service.relateImagesArrayToItem(id_product, image_array); 
   res.send(response)  
@@ -163,12 +170,51 @@ controller.catalogGyW = async(req, res, next) => {
   res.send(catalog)
 }
 
-controller.catalogGyWPrueba = async(req, res, next) => { 
-  let id_company = 20; // Grulla y Wellco 
-  let catalog = await service.catalogGyWPrueba(id_company); 
-  res.send(catalog)
-}
 
+controller.catalogGyWPrueba = async(req, res, next) => { 
+  let response = await service.getCatalogGrulla(); 
+  
+  let items = [];
+  let products = response.result;
+
+  for (let i = 0; i < products.length; i++) {
+    
+    if (!items.filter(e => e.code == products[i].code.substring(0, 5)).length > 0) {
+      let objItem = {              
+        idItem: products[i].id,
+        code: products[i].code.substring(0, 5),
+        description: products[i].description,
+        image: products[i].image,
+        image_array: products[i].image_array,
+        talla_array: [products[i].size], // Array de tallas
+        color_array: [products[i].color], // Array de colores
+      }
+
+      if (products[i].atributos) {
+        let att = products[i].atributos.split(",")
+        let attDetail = products[i].detalle_atributos.split(",")
+
+        for (let e = 0; e < att.length; e++) {
+          objItem[att[e]] = attDetail[e]
+        }
+      }
+
+      items.push(objItem)
+    } else {
+      let index = items.findIndex(object => {return object.code === products[i].code.substring(0, 5)});
+
+      if (!items[index].talla_array.includes(products[i].size)) {
+        items[index].talla_array.push(products[i].size)
+      }
+
+      if (!items[index].color_array.includes(products[i].color)) {
+        items[index].color_array.push(products[i].color)
+      }
+    }
+  }
+
+  res.send(items)
+}
 
 controller.catalogDetailGyW = async(req, res, next) => { 
   let id_company = req.params.id_company;
@@ -271,7 +317,7 @@ controller.catalogAttributesAndDetail = async(req, res, next) => {
   res.send({attributes: attributes.result, attributesDetail: attributesDetail.result})
 }
 
-controller.catalogAttributesByIdItem = async(req, res, next) => { 
+controller.catalogAttributesByIdItem = async(req, res, next) => {  // TODO detail item
   let id_item = req.params.id_item;
 
   let attributes = await service.catalogAttributeByIdItem(id_item); 

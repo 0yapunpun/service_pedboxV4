@@ -29,12 +29,12 @@ router.get('/catalog/colors/:id_company', catalogController.catalogColors)
 router.get('/catalog/GyW', catalogController.catalogGyW)
 router.get('/catalog/GyW/prueba', catalogController.catalogGyWPrueba)
 
-
 router.get('/catalog/detail/:id_company/:code_product', catalogController.catalogDetailGyW)
 router.get('/catalog/images/:id_company', catalogController.catalogImages)
 router.get('/catalog/attachments/:id_company', catalogController.catalogAttachments)
-router.get('/catalog/codes/:id_company', catalogController.catalogCodes)
+router.get('/catalog/deleteAttachmentsByIdItem/:id_company/:id_item', catalogController.deleteAttachmentsByIdItem)
 
+router.get('/catalog/codes/:id_company', catalogController.catalogCodes)
 router.get('/catalog/codesSubstring/:id_company', catalogController.catalogCodesSubstring)
 router.get('/catalog/codesSubstringDesc/:id_company', catalogController.catalogCodesSubstringDesc)
 
@@ -54,7 +54,6 @@ router.post('/catalog/relateAttributesBySubstring', catalogController.catalogRel
 router.get('/catalog/catalogCodesAssociateToAttribute/:id_attribute', catalogController.catalogCodesAssociateToAttribute)
 router.get('/catalog/catalogDeleteAttributesByCode/:id_attribute/:code/:id_company', catalogController.catalogDeleteAttributesByCode)
 router.get('/catalog/deleteAttachmentDetailAttribute/:id_image/:id_attribute', catalogController.deleteAttachmentDetailAttribute)
-
 
 router.get('/catalog/catalogAttributesByIdItem/:id_item', catalogController.catalogAttributesByIdItem)
 
