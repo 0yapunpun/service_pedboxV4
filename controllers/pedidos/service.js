@@ -16,7 +16,7 @@ service.getUserRole = async(user, id_company) => {
 
 service.getRolePermissions = async(id_role) => { 
   let query = `
-    SELECT * FROM tbl_gen_configuration_role where id_role = ${id_role} AND id_configuration = 305
+    SELECT content FROM tbl_gen_configuration_role where id_role = ${id_role} AND id_configuration = 305
   `;
 
   const { e, r } = await mysql.aQuery(query);

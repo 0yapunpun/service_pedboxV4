@@ -17,19 +17,18 @@ const makeRequest = async (url, options) => {
       const json = await resp.json();
       return {'result': json};
   } catch(error) {
-      return {'err': 'Error obteniendo los datos', 'err_service': error};
+      return {'err': 'Error Envianto Peticion', 'err_service': error};
   }
 }
 
 const makeRequestXML = async (url, options) => {
   try {
       var resp = await fetch(url, options || {});
-      let xml = await resp.text();
-      const json = xml_json.xml2json(xml, {compact: false, spaces: 2, trim: true})
-      return {'result': JSON.parse(json)};
+      // let xml = await resp.text();
+      // const json = xml_json.xml2json(xml, {compact: false, spaces: 2, trim: true})
+      return {'result': resp};
   } catch(error) {
-      showLog('REQUEST URL: '+url, error);
-      return {'err': 'Error obteniendo los datos', 'err_service': error};
+    return {'err': 'Error Envianto Peticion', 'err_service': error};
   }
 }
 
@@ -39,7 +38,7 @@ controller.sendOrder = async(req, res, next) => {
   let responseService = null;
   let hasPermission = false;
 
-  let userRole = await service.getUserRole(data.user_request, data.id_company); 
+  let userRole = await service.getUserRole(data.user, data.id_company); 
 
   if (userRole.result.length) {
     let roleHasPermission = await service.getRolePermissions(userRole.result[0].id_role);
@@ -49,28 +48,28 @@ controller.sendOrder = async(req, res, next) => {
       } 
     } 
   }
-    
+
   if (!hasPermission) {
     bodyRequest = {
-      pbodega: data.seller['id_warehouse'].toString(),
-      pnit: data.nit.toString(),
-      pvendedor: data.seller['nit'].toString() || data.seller['id_seller'].toString(),
+      pbodega: data.id_warehouse.toString(),
+      pnit: data.nit_seller.toString(),
+      pvendedor: data.nit_seller.toString(),
       pfecha: data.date.replace(/(\-)/g, ''),
       pfechadespacho: data.date.replace(/(\-)/g, '') ,
       pdireccion: data.address || '',
-      popt1: data.address_code || '',
-      pdescuento: data.total_disocunt.toString(),
+      popt1: data.popt1 || '',
+      pdescuento: data.discount.toString(),
       ptotal: data.total.toString(),
       pnota: data.note,   
-      pequipo: data.equipo,
+      pequipo: data.device,
       plongitud: data.longitude || '',
       platitud: data.latitude || '',
       pempresa: data.id_company,
       pimei: data.imei || '0.0.0.0',
-      pusuario: data.usuario,
+      pusuario: data.user,
       pitems: data.items,
       ptipo: "1",
-      popt2: "0",
+      popt2: data.popt2,
       op: "pedido",
       pdocumento: "",
       pdias: '0',
@@ -79,30 +78,30 @@ controller.sendOrder = async(req, res, next) => {
   } else {
     bodyRequest = {
       createMonitoring: "true",
-      Sellers: [data.seller['nit'].toString() || data.seller['id_seller'].toString()],
+      Sellers: [{id_warehouse: data.id_warehouse.toString(), id_seller: data.id_seller.toString()}],
       Monitoring: [],
       EncQuotation: {
         imei: data.imei || '0.0.0.0',
         id_company: data.id_company,
         nit_customer: data.nit_customer.toString(),
-        id_warehouse: data.seller['id_warehouse'].toString(),
-        id_seller: data.seller['id_seller'].toString(),
-        id_user: data.seller['id_seller'].toString(),
+        id_warehouse: data.id_warehouse.toString(),
+        id_seller: data.nit_seller.toString(),
+        id_user: data.nit_seller.toString(),
         longitude: data.longitude || '',
         latitude: data.latitude || '',
         state: hasPermission ? 1 : 0,
-        id_address: data.address_code || '0', 
+        id_address: data.popt1 || '0', 
         amount: Math.round(data.total).toString(),
         note: data.note || '',
         date: data.date.replace(/(\-)/g, ''),
         date_send: '',
         document_ref: '',
-        equipment: data.equipo,
+        equipment: data.device,
         type: 2000,
         id_mobile: '',
         id_payment_way: '0',
         id_limit_time: '0',
-        tax: Math.round(data.iva_total).toString() 
+        tax: Math.round(data.iva).toString() 
       },
       Parameters: {
         setNumQuotation: "true",
@@ -113,14 +112,14 @@ controller.sendOrder = async(req, res, next) => {
     }; 
   }
 
-  console.log(bodyRequest)
+  // console.log(bodyRequest)
   // return res.send(true)
 
   if (!hasPermission) {
     let randomIdentifier = crypto.randomBytes(16).toString("hex");
-    let url = "http://localhost/genesis4/wsdata.asmx?wsdl"
+    let url = "http://pedbox.co/genesis4/wsdata.asmx?wsdl"
     const options = {
-      method: 'GET',
+      method: 'POST',
       headers: { 'Content-Type': 'text/xml' },
       body: `<?xml version="1.0" encoding="utf-8"?>
         <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
