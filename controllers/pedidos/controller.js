@@ -1,6 +1,5 @@
 const controller = {};
-const fetch = (...args) =>
-      import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const fetch = require('node-fetch');
 const service = require('./service.js');
 const config = require('../../config.js');
 const crypto = require("crypto");
