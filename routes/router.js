@@ -4,7 +4,7 @@ const calendarController = require('../controllers/calendar/controller.js');
 const documentosController = require('../controllers/documentos/controller.js');
 const notificationsController = require('../controllers/notifications/controller.js');
 const catalogController = require('../controllers/catalogo/controller.js');
-
+const orderController = require('../controllers/pedidos/controller.js');
 
 // Agenda
 router.get('/birthdays/:id_company', calendarController.birthdays);
@@ -25,19 +25,15 @@ router.get('/getNotificationsCalendar/:id_user', notificationsController.getNoti
 
 // Catalogo
 router.get('/catalog/colors/:id_company', catalogController.catalogColors)
-
 router.get('/catalog/GyW', catalogController.catalogGyW)
 router.get('/catalog/GyW/prueba', catalogController.catalogGyWPrueba)
-
 router.get('/catalog/detail/:id_company/:code_product', catalogController.catalogDetailGyW)
 router.get('/catalog/images/:id_company', catalogController.catalogImages)
 router.get('/catalog/attachments/:id_company', catalogController.catalogAttachments)
 router.get('/catalog/deleteAttachmentsByIdItem/:id_company/:id_item', catalogController.deleteAttachmentsByIdItem)
-
 router.get('/catalog/codes/:id_company', catalogController.catalogCodes)
 router.get('/catalog/codesSubstring/:id_company', catalogController.catalogCodesSubstring)
 router.get('/catalog/codesSubstringDesc/:id_company', catalogController.catalogCodesSubstringDesc)
-
 router.post('/catalog/uploadImages/:fileName/:id_company', catalogController.uploadImages)
 router.post('/catalog/uploadAttachedsFichas/:fileName/:id_company', catalogController.uploadAttachedsFichas)
 router.post('/catalog/uploadAttachedsImages/:fileName/:id_company/:sequence', catalogController.uploadAttachedsImages)
@@ -47,14 +43,16 @@ router.get('/catalog/removeImages/:code/:id_company', catalogController.removeIm
 router.get('/catalog/getItems/substring/:code/:id_company', catalogController.selectItemsByCodeSubstring)
 router.get('/catalog/getImagesAttachment/:images_array', catalogController.imageAttachment)
 router.get('/catalog/getItemByCodeColor/:code/:code_color', catalogController.productBycodeColor)
-
 router.get('/catalog/getAttributes/:id_company', catalogController.catalogAttributesAndDetail)
 router.get('/catalog/deleteAttributeAssociated/:id_attribute/:id_item', catalogController.deleteAttributeById)
 router.post('/catalog/relateAttributesBySubstring', catalogController.catalogRelateAttributesBySubstring)
 router.get('/catalog/catalogCodesAssociateToAttribute/:id_attribute', catalogController.catalogCodesAssociateToAttribute)
 router.get('/catalog/catalogDeleteAttributesByCode/:id_attribute/:code/:id_company', catalogController.catalogDeleteAttributesByCode)
 router.get('/catalog/deleteAttachmentDetailAttribute/:id_image/:id_attribute', catalogController.deleteAttachmentDetailAttribute)
-
 router.get('/catalog/catalogAttributesByIdItem/:id_item', catalogController.catalogAttributesByIdItem)
+
+// Pedidos
+router.post('/order/sendOrder', orderController.sendOrder)
+
 
 module.exports = router;

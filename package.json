@@ -11,6 +11,7 @@
     "mssql": "^8.0.2",
     "multer": "^1.4.4",
     "mysql": "^2.18.1",
+    "node-fetch": "^3.2.6",
     "nodemon": "^2.0.15",
     "underscore": "^1.13.2",
     "util": "^0.12.4"
@@ -24,3 +25,5 @@
   "author": "",
   "license": "ISC"
 }
+
+

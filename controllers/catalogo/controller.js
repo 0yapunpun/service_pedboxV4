@@ -7,7 +7,7 @@ const multer  = require('multer');
 const { JSON } = require('mysql/lib/protocol/constants/types');
 const now = Date.now();
 
-let id_current_company = 1; // Variable for save files in the correspond folder
+let id_current_company = 1; // Default folder to save files
 
 let storeImages = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -317,7 +317,7 @@ controller.catalogAttributesAndDetail = async(req, res, next) => {
   res.send({attributes: attributes.result, attributesDetail: attributesDetail.result})
 }
 
-controller.catalogAttributesByIdItem = async(req, res, next) => {  // TODO detail item
+controller.catalogAttributesByIdItem = async(req, res, next) => {  
   let id_item = req.params.id_item;
 
   let attributes = await service.catalogAttributeByIdItem(id_item); 
